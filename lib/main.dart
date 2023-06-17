@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:openai_chat_gpt_flutter/screens/chatbot_ui.dart';
 
-
 void main() {
   runApp(const MentalHealthApp());
 }
-
 
 class MentalHealthApp extends StatelessWidget {
   const MentalHealthApp({super.key});
@@ -19,7 +17,7 @@ class MentalHealthApp extends StatelessWidget {
         fontFamily: 'Roboto', // Use a legible font
       ),
       routes: {
-        '/':(context) => HomePage(),
+
         '/chat': (context) => ChatBotWidget(),
       },
       home: const HomePage(),
@@ -57,8 +55,12 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 32.0),
             ElevatedButton(
-              onPressed: () {
-                // Action to navigate to the chat screen
+              onPressed: (){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                    builder: (context) => ChatBotWidget(),
+                ));
               },
               child: const Text('Start a Conversation'),
             ),
@@ -68,4 +70,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
