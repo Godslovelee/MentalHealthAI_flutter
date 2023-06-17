@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:openai_chat_gpt_flutter/screens/chatbot_ui.dart';
 
 
 void main() {
@@ -18,7 +19,8 @@ class MentalHealthApp extends StatelessWidget {
         fontFamily: 'Roboto', // Use a legible font
       ),
       routes: {
-        '/':(context) => HomePage()
+        '/':(context) => HomePage(),
+        '/chat': (context) => ChatBotWidget(),
       },
       home: const HomePage(),
     );
