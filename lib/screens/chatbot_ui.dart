@@ -8,6 +8,7 @@ class ChatBotWidget extends StatefulWidget {
 class _ChatBotWidgetState extends State<ChatBotWidget> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
+  final FocusNode _focusNode = FocusNode();
 
   void _sendMessage(String message) {
     setState(() {
@@ -28,43 +29,60 @@ class _ChatBotWidgetState extends State<ChatBotWidget> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Request focus on the TextField when the widget is initialized
+    _focusNode.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    // Dispose the FocusNode when the widget is disposed
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: _messages.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(_messages[index]),
-              );
-            },
+    return Material(
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: _messages.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(_messages[index]),
+                );
+              },
+            ),
           ),
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  decoration: const InputDecoration(
-                    hintText: 'Type a message...',
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    focusNode: _focusNode,
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: 'Type a message...',
+                    ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(Icons.send),
-                onPressed: () {
-                  if (_controller.text.isNotEmpty) {
-                    _sendMessage(_controller.text);
-                  }
-                },
-              ),
-            ],
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    if (_controller.text.isNotEmpty) {
+                      _sendMessage(_controller.text);
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
