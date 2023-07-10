@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:openai_chat_gpt_flutter/models/models_provider.dart';
+import 'package:openai_chat_gpt_flutter/repository/api_repo.dart';
+import 'package:openai_chat_gpt_flutter/widgets/chat_widget.dart';
+import 'package:provider/provider.dart';
+
+import '../models/chat_model.dart';
 
 class ChatBotWidget extends StatefulWidget {
   @override
@@ -6,77 +12,71 @@ class ChatBotWidget extends StatefulWidget {
 }
 
 class _ChatBotWidgetState extends State<ChatBotWidget> {
-  final TextEditingController _controller = TextEditingController();
+ 
+  late TextEditingController textEditingController;
   final List<String> _messages = [];
-  final FocusNode _focusNode = FocusNode();
+
+  void initState() {
+    textEditingController = TextEditingController();
+    super.initState();
+  }
+
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
+  }
+
+  List<ChatModel> chatList = [];
 
   void _sendMessage(String message) {
     setState(() {
       _messages.add(message);
     });
-    // Implement your chatbot logic here and generate a response
-    String response = generateResponse(message);
-    setState(() {
-      _messages.add(response);
-    });
-    _controller.clear();
-  }
-
-  String generateResponse(String message) {
-    // Replace this with your own logic to generate chatbot responses
-    // You can use AI or predefined logic to generate responses
-    return "You said: $message";
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Request focus on the TextField when the widget is initialized
-    _focusNode.requestFocus();
-  }
-
-  @override
-  void dispose() {
-    // Dispose the FocusNode when the widget is disposed
-    _focusNode.dispose();
-    super.dispose();
+    textEditingController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Column(
+    final modelProvider = Provider.of<ModelsProvider>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('ChatBot'),
+      ),
+      body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: _messages.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(_messages[index]),
-                );
+              itemCount: chatList.length,
+              itemBuilder: (BuildContext context, index) {
+                return ChatWidget(
+                    msg: chatList[index].msg,
+                    chatIndex: (chatList[index].chatIndex));
               },
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.all(16.0),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
-                    focusNode: _focusNode,
-                    controller: _controller,
-                    decoration: const InputDecoration(
+                    controller: textEditingController,
+                    onSubmitted: (value) async {
+                      await sendMessageFCT(modelsProvider: modelProvider);
+                    },
+                    decoration: InputDecoration(
                       hintText: 'Type a message...',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    if (_controller.text.isNotEmpty) {
-                      _sendMessage(_controller.text);
-                    }
+                SizedBox(width: 16.0),
+                FloatingActionButton(
+                  onPressed: () async {
+                    await sendMessageFCT(modelsProvider: modelProvider);
                   },
+                  child: Icon(Icons.send),
                 ),
               ],
             ),
@@ -84,5 +84,24 @@ class _ChatBotWidgetState extends State<ChatBotWidget> {
         ],
       ),
     );
+  }
+
+  Future<void> sendMessageFCT({required ModelsProvider modelsProvider}) async {
+    try {
+      print("Sending chat data");
+      chatList = await APIservice.sendChatData(
+          message: textEditingController.text,
+          modelId: modelsProvider.getCurrentModel);
+
+
+    } catch (e) {
+      print("error $e");
+    }
+
+    final message = textEditingController.text.trim();
+    if (message.isNotEmpty) {
+      _sendMessage(message);
+      print("message sending");
+    }
   }
 }
