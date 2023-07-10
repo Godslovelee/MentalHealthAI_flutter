@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:openai_chat_gpt_flutter/models/models_provider.dart';
 import 'package:openai_chat_gpt_flutter/screens/chatbot_ui.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MentalHealthApp());
@@ -10,17 +12,23 @@ class MentalHealthApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mental Health Support App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Roboto', // Use a legible font
-      ),
-      routes: {
+    return MultiProvider(
 
-        '/chat': (context) => ChatBotWidget(),
-      },
-      home: const HomePage(),
+      providers: [
+        ChangeNotifierProvider(create: (_) => ModelsProvider())
+      ],
+      child: MaterialApp(
+        title: 'Mental Health Support App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          fontFamily: 'Roboto', // Use a legible font
+        ),
+        routes: {
+
+          '/chat': (context) => ChatBotWidget(),
+        },
+        home: const HomePage(),
+      ),
     );
   }
 }
@@ -59,8 +67,8 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                    builder: (context) => ChatBotWidget(),
-                ));
+                      builder: (context) => ChatBotWidget(),
+                    ));
               },
               child: const Text('Start a Conversation'),
             ),
