@@ -12,7 +12,6 @@ class ChatBotWidget extends StatefulWidget {
 }
 
 class _ChatBotWidgetState extends State<ChatBotWidget> {
- 
   late TextEditingController textEditingController;
   final List<String> _messages = [];
 
