@@ -7,5 +7,5 @@ class ChatModel{
   factory ChatModel.fromJson(Map<String, dynamic> jsonmodel) => ChatModel(
       msg: jsonmodel["msg"],
       chatIndex: jsonmodel["chatIndex"],);
-
+      //created: jsonmodel["created"]);
 }
